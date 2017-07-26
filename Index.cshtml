@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = "Index";
+}
+<link href="~/Content/generalMessageError.css" rel="stylesheet" />
+@section scripts{
+    <style>
+        .col-md-1 {
+            width: 11%;
+            margin-left: -5px;
+        }
+
+        .col-md-4 {
+            margin-left: -20px;
+        }
+    </style>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script type="text/javascript">
+        //$('#exportPoint').validate({
+        //    rules: {
+        //        year: {
+        //            required: true,
+        //            number: true
+        //        },
+        //    },
+
+        //    messages: {
+        //        year: 'Field year must be number !'
+        //    },
+
+        //    highlight: function (element) {
+        //        $(element).closest('.form-group').addClass('has-error');
+        //    },
+
+        //    success: function (label) {
+        //        label.closest('.form-group').removeClass('has-error');
+        //        label.remove();
+        //    },
+
+        //    errorElement: 'span',
+        //    errorClass: 'help-block',
+        //});
+    </script>
+}
+
+<h2>Index</h2>
+<div class="row">
+    <div class="col-md-12">
+        <div class="alert alert-danger alert-dismissible @if (TempData["Error"] == null) { <text>hidden</text> } " role="alert">
+            <strong>Error !</strong> @if (TempData["Error"] != null)
+            { <text>@TempData["Error"]</text> }
+        </div>
+        <div class="alert alert-success alert-dismissible @if (TempData["Success"] == null) { <text>hidden</text> } " role="alert">
+            <strong>Information !</strong> @if (TempData["Success"] != null)
+            { <text>@TempData["Success"]</text> }
+        </div>
+    </div>
+</div>
+<h3>Import</h3>
+@using (Html.BeginForm("Import", "Point", FormMethod.Post, new { id = "importPoint", enctype = "multipart/form-data" }))
+{
+    <img src="~/Content/Loading_icon.gif" style="height:300px;width:450px;display:none;" id="loadingImg" />
+    <br />
+        <input type="file" accept=".csv" name="uploadFile" id="uploadFile">
+        <br />
+        <a href="javascript:document.getElementById('importPoint').submit()" class="btn btn-success" role="button" onclick="showLoading()" id="importBtn">Import</a>
+}
+<hr />
+<h3>Export</h3>
+<br />
+@using (Html.BeginForm("Export", "Point", FormMethod.Post, new { id = "exportPoint" }))
+{
+    <div class="form-inline">
+        <div class="form-group">
+            <label class=".col-xs-6 .col-md-4 control-label">年度</label>
+            <input type="text" class="form-control" id="year" name="year">
+            <label class=".col-xs-6 .col-md-4 control-label">(必須)</label>
+        </div>
+    </div>
+    <br />
+    <span id="productItemError" class="messageError" style="color:red"></span>
+    <h3 style="margin-top:-1%" hidden class="messageError  notifyinputQuantity messageErrorinputQuantity">Nhập số lượng s!</h3>
+    <br />
+
+        <div class="form-group">
+            <div class="col-sm-0">
+                <input type="button" value="Export" class="btn btn-success" id="exportButton">
+            </div>
+        </div>
+}
+<div id="log"></div>
+<script>
+    function showLoading() {
+        var filename = document.getElementById('uploadFile').value;
+        if (filename !== "") {
+            document.getElementById('loadingImg').style.display = 'block';
+            document.getElementById('importBtn').disabled = true;
+            document.getElementById('exportButton').disabled = true;
+        }
+    }
+</script>
+
+<script>
+    $('#exportPoint').click(function () {
+        var div = document.createElement('div');
+        var isValidItem = true;
+        if ($('#year').val() == '') {
+            isValidItem = false;
+            $('#productItemError').text('Chưa nhập year!');
+            document.getElementById("log").innerHTML = " <div class='alert alert-danger alert-dismissible'>The record over 200,000 row. Please filter!</div>";
+            document.getElementById("year").focus();
+            document.getElementById("year").style.borderColor = "red";
+        }
+        else {
+            if (isNaN($('#year').val().trim()))
+            {
+               
+                isValidItem = false;
+                //$('#productItemError').text('nhập số year!');
+                document.getElementById("year").focus();
+                document.getElementById("year").style.borderColor = "red";
+            }
+            else {
+                $('#productItemError').hide();
+                document.getElementById("year").style.borderColor = "#cccccc";
+            }
+        }
+
+        //Add product to list if valid
+        if (isValidItem == true) {
+            document.getElementById('exportPoint').submit();
+            isValidItem = false;
+        }
+    });
+</script>
